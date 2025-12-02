@@ -10,30 +10,32 @@ const Footer = () => {
             <div className="footer-logos">
               <div className="wheel"></div>
             </div>
-            <p className="mt-4 text-gray-400">Your one-stop shop for Wellness!</p>
+            <p className="mt-4 text-gray-400">Your one-stop shop for wellness!</p>
           </div>
 
-          {/* Sister Companies */}
-          <div className="sister-companies">
-            <h4 className="mb-4 text-lg font-semibold text-white">Sister Companies</h4>
-            <div className="space-y-2">
-              {[
-                { name: 'Toy Vista', url: 'https://toyvista.com/' },
-                { name: 'Tech Heaven Stores', url: 'https://techheavenstores.com' },
-                { name: 'Shoespire', url: 'https://shoespire.com' }
-              ].map((company) => (
-                <a
-                  key={company.name}
-                  href={company.url}
-                  className="block text-gray-400 transition-colors duration-200 hover:text-white"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {company.name}
-                </a>
-              ))}
-            </div>
-          </div>
+         {/* Sister Companies */}
+<div className="sister-companies">
+  <h4 className="mb-4 text-lg font-semibold text-white">Sister Companies</h4>
+  <div className="space-y-2">
+    {[
+      { name: 'Toy Vista', url: 'https://toyvista.com' },
+      { name: 'iShoez', url: 'https://ishoez.com' },
+      { name: 'DGPick', url: 'https://dgpick.com' },
+      { name: 'Electronixa', url: 'https://electronixa.com' }
+    ].map((company) => (
+      <a
+        key={company.name}
+        href={company.url}
+        className="block text-gray-400 transition-colors duration-200 hover:text-white"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        {company.name}
+      </a>
+    ))}
+  </div>
+</div>
+
 
           {/* Useful Links */}
           <div className="useful-links">
@@ -44,7 +46,7 @@ const Footer = () => {
                 { name: 'Privacy Policy', url: '/privacy-policy' },
                 { name: 'Terms of Service', url: '/terms-of-service' },
                 { name: 'FAQ', url: '/faq' },
-                { name: 'Disclaimer', url: '/disclaimer' }
+                { name: 'Disclaimer', url: '/disclaimer' },
               ].map((link) => (
                 <a
                   key={link.name}
@@ -65,7 +67,7 @@ const Footer = () => {
                 href="mailto:contact@toyvista.com" 
                 className="text-gray-400 transition-colors duration-200 hover:text-white"
               >
-                Email: contact@toyvista.com
+                Email: contact@wellnesWorld.com
               </a>
             </p>
 
@@ -160,11 +162,11 @@ const Footer = () => {
           width: 120px;
           height: 120px;
           border-radius: 50%;
-          background: url('/public/images/logo (1).webp') no-repeat center/contain;
+          background: url('/images/logo.png') no-repeat center/contain;
           position: absolute;
           bottom: 10px;
           left: 0;
-          /* animation: roll 4s linear infinite alternate; */
+          animation: roll 4s linear infinite alternate;
         }
 
         @keyframes roll {

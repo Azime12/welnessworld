@@ -59,7 +59,7 @@ const ProductList = () => {
 
         // Now fetch products for this subcategory
         const prodRes = await axios.get(`${BASE_URL}/products.php`);
-        
+        console.log("products",prodRes)
         if (prodRes.data && Array.isArray(prodRes.data)) {
           // Filter products by subcategory if we have one
           let filteredProducts = prodRes.data;
@@ -245,54 +245,7 @@ const ProductList = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Breadcrumb Header */}
-      {/* <div className="py-1 text-gray-900 md:py-5">
-        <div className="container px-4 mx-auto">
-          <div className="flex flex-col items-center md:flex-row md:justify-between">
-            <div className="mb-4 md:mb-0">
-              <nav className="flex mb-2 space-x-2 text-sm">
-                <Link to="/" className="text-blue-600 hover:text-blue-800">
-                  Home
-                </Link>
-                {parentCategory && (
-                  <>
-                    <span className="text-gray-400">/</span>
-                    <Link 
-                      to={`/category/${parentCategory.slug}`}
-                      className="text-blue-600 hover:text-blue-800"
-                    >
-                      {parentCategory.name}
-                    </Link>
-                  </>
-                )}
-                {subcategory && (
-                  <>
-                    <span className="text-gray-400">/</span>
-                    <span className="text-gray-700">{subcategory.name}</span>
-                  </>
-                )}
-              </nav>
-              <h1 className="text-2xl font-bold md:text-3xl">
-                {subcategory?.name || 'All Products'}
-              </h1>
-              <p className="mt-2 text-gray-600">
-                {products.length} products found
-              </p>
-            </div>
-            
-            <div className="flex items-center">
-              <Link
-                to="/"
-                className="flex items-center px-4 py-2 text-sm font-medium text-gray-700 transition-colors bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
-              >
-                <ChevronLeft className="w-4 h-4 mr-2" />
-                Back to Home
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div> */}
-
+      
       {/* Error Message */}
       {error && (
         <div className="container px-4 mx-auto mt-6">
@@ -305,25 +258,7 @@ const ProductList = () => {
 
       {/* Main Content */}
       <main className="container px-4 py-8 mx-auto">
-        {/* Search Bar */}
-        <div className="mb-8">
-          <form onSubmit={handleSearch} className="relative max-w-xl mx-auto">
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search within this category..."
-              className="w-full px-4 py-3 pl-12 pr-16 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-            <Search className="absolute w-5 h-5 text-gray-400 transform -translate-y-1/2 left-4 top-1/2" />
-            <button
-              type="submit"
-              className="absolute px-4 py-2 text-sm font-medium text-white transform -translate-y-1/2 bg-blue-600 rounded-md right-2 top-1/2 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-            >
-              Search
-            </button>
-          </form>
-        </div>
+       
 
         {/* Filters and Sort Bar */}
         <div className="flex flex-col items-start justify-between p-4 mb-8 bg-white rounded-lg shadow-sm md:flex-row md:items-center">
@@ -368,7 +303,7 @@ const ProductList = () => {
                     e.target.src = "https://via.placeholder.com/300x300/1e88e5/ffffff?text=Toy";
                   }}
                 />
-                {product.is_trending ? (
+                {/* {product.is_trending!='0' ? (
                   <div className="absolute px-2 py-1 text-xs font-bold text-white bg-yellow-500 rounded top-2 right-2">
                     Trending
                   </div>
@@ -376,7 +311,7 @@ const ProductList = () => {
                   <div className="absolute px-2 py-1 text-xs font-bold text-white bg-green-500 rounded top-2 right-2">
                     New
                   </div>
-                )}
+                )} */}
               </div>
               
               <div className="p-4">
@@ -401,19 +336,18 @@ const ProductList = () => {
                 
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-lg font-bold text-blue-600">
-                    {product.price}
+                {product?.price } 
                   </span>
-                  {renderStars(product.rating)}
                 </div>
                 
-                <div className="flex items-center justify-between mb-4">
+                {/* <div className="flex items-center justify-between mb-4">
                   <span className="text-xs text-gray-500">
                     {product.reviewCount} reviews
                   </span>
                   {product.asin && (
                     <span className="text-xs text-gray-400">ASIN: {product.asin}</span>
                   )}
-                </div>
+                </div> */}
                 
                 <Link 
                   to={`/product/${product.slug}/detail`}
@@ -422,7 +356,7 @@ const ProductList = () => {
                     subcategory,
                     parentCategory 
                   }}
-                  className="block w-full px-4 py-2 font-semibold text-center text-white transition-all duration-300 rounded-lg shadow-md bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 hover:shadow-lg"
+                  className="block w-full px-4 py-2 font-semibold text-center text-white transition-all duration-300 rounded-lg shadow-md bg-gradient-to-r from-green-400 to-green-800 hover:from-blue-600 hover:to-blue-700 hover:shadow-lg"
                 >
                   View Details
                 </Link>

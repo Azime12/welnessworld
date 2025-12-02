@@ -11,7 +11,6 @@ import WhyToyvista from "./pages/whyToyvista";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
-import BlogPost from "./pages/blogs";
 import Disclaimer from "./pages/disclaimer";
 import AboutUs from "./pages/about";
 import PrivacyPolicy from "./pages/privacyPolicy";
@@ -22,11 +21,11 @@ import ProductDetail from "./pages/productDetail";
 import SubCategory from "./pages/subCatagoriy";
 import BlogDetail from "./pages/blogsDetail";
 import AllBlogs from "./pages/blogs";
+import ProductSearch from "./components/ProductSearch";
 
 const App = () => {
   return (
     <Router>
-      {/* Header must be outside Routes */}
       <Header />
 
       <Routes>
@@ -44,6 +43,7 @@ const App = () => {
      <Route path="/categories/:slug" element={<SubCategory />} />
      <Route path="/categories/:slug" element={<SubCategory />} />
     <Route path="/product/:slug/detail" element={<ProductDetail />} />
+        <Route path="/search" element={<ProductSearch />} />
 
 
 
@@ -67,8 +67,6 @@ const App = () => {
             />
           }
         >
-          {/* Add protected routes here */}
-          {/* Example: <Route path="/dashboard" element={<Dashboard />} /> */}
         </Route>
 
         <Route path="*" element={<Navigate to="/" />} />

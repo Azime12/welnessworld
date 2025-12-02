@@ -1,15 +1,14 @@
 // src/pages/SubCategory.jsx
-import React, { useState, useEffect } from 'react';
-import { useParams, Link, useLocation, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { BASE_URL } from '../constants/apiTags';
+import React, { useState, useEffect } from "react";
+import { useParams, Link, useLocation, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { BASE_URL } from "../constants/apiTags";
 
 const SubCategory = () => {
-  const { slug } = useParams(); // category slug from URL
+  const { slug } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Try to get category data from location.state first
   const categoryFromState = location.state?.category;
 
   const [loading, setLoading] = useState(true);
@@ -17,7 +16,7 @@ const SubCategory = () => {
   const [category, setCategory] = useState(categoryFromState || null);
   const [subcategories, setSubcategories] = useState([]);
 
-  // Fallback subcategories in case API fails
+  // Fallback demo subcategories
   const fallbackSubcategories = [
     { id: 1, name: "Robotic Kits", slug: "robotic-kits" },
     { id: 2, name: "Coding & Programming Toys", slug: "coding-programming-toys" },
@@ -31,21 +30,16 @@ const SubCategory = () => {
     { id: 10, name: "Puzzle & Brain Teasers", slug: "puzzle-brain-teasers" },
   ];
 
-  // Fetch category by slug if not passed in location.state
+  // Fetch category by slug if not provided via state
   useEffect(() => {
     const fetchCategoryBySlug = async () => {
       if (!categoryFromState) {
         try {
-          const res = await axios.get(`${BASE_URL}/categories.php`, {
-            params: { slug },
-          });
-          if (res.data) {
-            setCategory(res.data);
-          } else {
-            setError("Category not found");
-          }
+          const res = await axios.get(`${BASE_URL}/categories.php`, { params: { slug } });
+          if (res.data) setCategory(res.data);
+          else setError("Category not found");
         } catch (err) {
-          console.error("Error fetching category:", err);
+          console.error(err);
           setError("Failed to load category");
         }
       }
@@ -54,10 +48,10 @@ const SubCategory = () => {
     fetchCategoryBySlug();
   }, [slug]);
 
-  // Fetch subcategories when category is ready
+  // Fetch subcategories
   useEffect(() => {
     const fetchSubcategories = async () => {
-      if (!category?.id) return; // wait for category
+      if (!category?.id) return;
 
       setLoading(true);
       setError(null);
@@ -71,12 +65,10 @@ const SubCategory = () => {
           setSubcategories(res.data);
         } else {
           setSubcategories(fallbackSubcategories);
-          setError("No subcategories found. Showing fallback data.");
         }
       } catch (err) {
-        console.error("Error fetching subcategories:", err);
+        console.error(err);
         setSubcategories(fallbackSubcategories);
-        setError("Failed to load subcategories. Showing fallback data.");
       } finally {
         setLoading(false);
       }
@@ -85,24 +77,24 @@ const SubCategory = () => {
     fetchSubcategories();
   }, [category]);
 
-  // Utility to generate slug if missing
   const getSlug = (subcategory) =>
-    subcategory.slug || subcategory.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    subcategory.slug || subcategory.name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
 
+  /**
+   * ============================
+   *        LOADING UI
+   * ============================
+   */
   if (loading) {
     return (
       <main className="flex-grow">
-        <div className="py-8 text-center text-gray-100 bg-gradient-to-r from-blue-600 to-cyan-600">
-          <div className="container px-4 mx-auto">
-            <h1 className="text-3xl font-bold tracking-wide">
-              {category?.name || 'Loading...'}
-            </h1>
-          </div>
+        <div className="py-8 text-center text-white bg-[#004400]">
+          <h1 className="text-3xl font-semibold">{category?.name || "Loading..."}</h1>
         </div>
 
-        <div className="container flex flex-col items-center justify-center px-4 py-12 mx-auto">
-          <div className="w-12 h-12 mb-4 border-4 border-blue-600 rounded-full border-t-transparent animate-spin"></div>
-          <p className="text-gray-600">Loading subcategories...</p>
+        <div className="flex flex-col items-center justify-center py-12">
+          <div className="w-12 h-12 border-4 border-[#009900] rounded-full border-t-transparent animate-spin"></div>
+          <p className="mt-4 text-gray-600">Loading subcategories...</p>
         </div>
       </main>
     );
@@ -110,83 +102,96 @@ const SubCategory = () => {
 
   return (
     <main className="flex-grow">
+
       {/* Header */}
-<div className="py-2 text-gray-100 bg-gray-800">
-  <div className="container px-4 mx-auto">
-    
-    {/* Left aligned back button */}
-    <div className="text-left">
-      <Link 
-        to="/categories" 
-        className="inline-flex items-center text-sm text-gray-300 hover:text-white"
-      >
-        <span className="mr-2">&lt;</span>
-        Back to Categories
-      </Link>
-    </div>
+      <div className="py-4 text-white bg-[#004400] shadow-md">
+        <div className="container px-4 mx-auto">
+          <div className="flex items-center justify-between">
 
-    {/* Centered Title */}
-    <h1 className="mb-2 text-2xl font-bold tracking-wide text-center">
-      {category?.name}
-    </h1>
+            {/* Back Button - left aligned */}
+            <button
+              onClick={() => navigate("/categories")}
+              className="text-sm transition text-[#99CC33] hover:text-white"
+            >
+              &lt; Back
+            </button>
 
-  </div>
-</div>
+            {/* Center Title */}
+            <h1 className="text-xl font-bold text-center">{category?.name}</h1>
 
+            {/* Invisible placeholder for balance */}
+            <div className="opacity-0">&lt; Back</div>
+          </div>
+        </div>
+      </div>
 
-      {/* Error */}
+      {/* Error Box */}
       {error && (
-        <div className="container px-4 mx-auto mt-6">
-          <div className="p-4 text-yellow-700 bg-yellow-100 border border-yellow-400 rounded-lg">
+        <div className="container px-4 mx-auto mt-4">
+          <div className="p-4 text-[#004400] bg-[#99CC3322] border border-[#99CC33] rounded-lg">
             {error}
           </div>
         </div>
       )}
 
-      {/* Subcategory Grid */}
-      <section className="px-4 py-12">
+      {/* Subcategory List */}
+      <section className="px-2 py-5">
         <div className="container mx-auto">
+
           <div className="mb-8 text-center">
-            <h2 className="text-2xl font-bold text-gray-900">
-              Choose a {category?.name?.toLowerCase()} subcategory
+            <h2 className="text-xl font-bold text-[#004400]">
+              Choose a {category?.name?.toLowerCase()} Subcategory
             </h2>
-            <p className="mt-2 text-gray-600">{subcategories.length} subcategories available</p>
+            <p className="mt-2 text-gray-600">
+              {subcategories.length} subcategories available
+            </p>
           </div>
 
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          {/* GRID RESPONSIVE */}
+          <div
+            className="
+              grid
+              grid-cols-2             /* XS: 2 columns */
+              sm:grid-cols-2          /* Small */
+              md:grid-cols-3          /* Medium */
+              lg:grid-cols-4          /* Large */
+              gap-6
+            "
+          >
             {subcategories.map((subcategory, index) => {
               const subSlug = getSlug(subcategory);
-              const isPopular = index < 4;
 
               return (
                 <Link
-                  key={subcategory.id || subcategory.name}
+                  key={subcategory.id || index}
                   to={`/product/${subSlug}`}
                   state={{ subcategory, parentCategory: category }}
-                  className={`group relative p-6 text-center transition-all duration-300 bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-lg hover:border-blue-300 hover:bg-blue-50 ${isPopular ? 'border-blue-100 bg-blue-50/50' : ''}`}
+                  className="
+                    group p-3 text-center bg-white border rounded-2xl 
+                    shadow-sm border-[#00990022]
+                    hover:border-[#009900]
+                    hover:shadow-lg 
+                    transition-all duration-300
+                  "
                 >
-                  {isPopular && (
-                    <div className="absolute -top-2 -left-2">
-                      <span className="px-2 py-1 text-xs font-bold text-white rounded-full bg-gradient-to-r from-blue-600 to-cyan-500">Popular</span>
-                    </div>
+                  <h3 className="mb-2 text-lg font-semibold text-[#004400] group-hover:text-[#009900]">
+                    {subcategory.name}
+                  </h3>
+
+                  {subcategory.description && (
+                    <p className="text-sm text-gray-600 line-clamp-2">
+                      {subcategory.description}
+                    </p>
                   )}
-                  <div className="flex items-center justify-center h-full">
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900 transition-colors duration-200 group-hover:text-blue-700">
-                        {subcategory.name}
-                      </h3>
-                      {subcategory.description && <p className="mt-2 text-sm text-gray-600 line-clamp-2">{subcategory.description}</p>}
-                      <div className="mt-4 transition-opacity duration-200 opacity-0 group-hover:opacity-100">
-                        <span className="inline-flex items-center font-medium text-blue-600">
-                          View Products <span className="ml-2 text-blue-500">&gt;</span>
-                        </span>
-                      </div>
-                    </div>
+
+                  <div className="mt-4 text-[#009900] opacity-0 group-hover:opacity-100 transition">
+                    View products →
                   </div>
                 </Link>
               );
             })}
           </div>
+
         </div>
       </section>
     </main>

@@ -69,13 +69,7 @@ const ProductDetail = () => {
                 price: foundProduct.price ? `$${parseFloat(foundProduct.price).toFixed(2)}` : '$0.00',
                 rating: 4.0 + Math.random() * 1.0,
                 reviewCount: Math.floor(Math.random() * 500) + 50,
-                features: [
-                  'Premium quality materials',
-                  'Safe for children of all ages',
-                  'Interactive and educational',
-                  'Easy to assemble',
-                  'Great value for money'
-                ],
+               
                 specifications: [
                   { label: 'Material', value: 'High-quality plastic' },
                   { label: 'Dimensions', value: 'Varies by set' },
@@ -284,57 +278,8 @@ const ProductDetail = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Breadcrumb Navigation */}
-      {/* <div className="bg-gradient-to-r from-blue-50 to-indigo-50">
-        <div className="container px-4 py-4 mx-auto">
-          <div className="flex items-center space-x-2 text-sm">
-            <button
-              onClick={() => navigate(-1)}
-              className="flex items-center text-blue-600 hover:text-blue-800"
-            >
-              <ArrowLeft className="w-4 h-4 mr-1" />
-              Back
-            </button>
-            <span className="text-gray-400">|</span>
-            <Link
-              to="/"
-              className="text-blue-600 hover:text-blue-800"
-            >
-              Home
-            </Link>
-            <ChevronRight size={14} className="text-gray-400" />
-            {location.state?.parentCategory && (
-              <>
-                <Link
-                  to={`/category/${location.state.parentCategory.slug}`}
-                  className="text-blue-600 hover:text-blue-800"
-                >
-                  {location.state.parentCategory.name}
-                </Link>
-                <ChevronRight size={14} className="text-gray-400" />
-              </>
-            )}
-            {location.state?.subcategory && (
-              <>
-                <Link
-                  to={`/subcategory/${location.state.subcategory.slug}`}
-                  className="text-blue-600 hover:text-blue-800"
-                  state={{ 
-                    subcategory: location.state.subcategory,
-                    parentCategory: location.state.parentCategory 
-                  }}
-                >
-                  {location.state.subcategory.name}
-                </Link>
-                <ChevronRight size={14} className="text-gray-400" />
-              </>
-            )}
-            <span className="max-w-xs font-medium text-gray-700 truncate">{product.name.substring(0, 50)}...</span>
-          </div>
-        </div>
-      </div> */}
+     
 
-      {/* Main Product Section */}
       <main className="container px-4 py-8 mx-auto">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
@@ -385,18 +330,18 @@ const ProductDetail = () => {
                   {product.name}
                 </h1>
                 <div className="flex items-center mb-4 space-x-4">
-                  <div className="flex items-center">
+                  {/* <div className="flex items-center">
                     {renderStars(product.rating)}
                     <span className="mx-2 text-gray-400">•</span>
                     <span className="text-gray-600">
                       {product.reviewCount?.toLocaleString() || '0'} reviews
                     </span>
-                  </div>
-                  {product.is_trending && (
+                  </div> */}
+                  {/* {product.is_trending && (
                     <span className="px-2 py-1 text-xs font-bold text-white bg-yellow-500 rounded">
                       Trending
                     </span>
-                  )}
+                  )} */}
                   {product.asin && (
                     <span className="px-2 py-1 text-xs font-medium text-gray-600 bg-gray-100 rounded">
                       ASIN: {product.asin}
@@ -405,7 +350,7 @@ const ProductDetail = () => {
                 </div>
 
                 {/* Price */}
-                <div className="mb-6">
+                {/* <div className="mb-6">
                   <div className="flex items-center space-x-3">
                     <span className="text-3xl font-bold text-blue-600">
                       {product.price}
@@ -416,7 +361,7 @@ const ProductDetail = () => {
                       </span>
                     )}
                   </div>
-                </div>
+                </div> */}
               </div>
 
               {/* Description */}
@@ -430,7 +375,7 @@ const ProductDetail = () => {
               </div>
 
               {/* Features */}
-              <div className="p-4 bg-white rounded-lg shadow-sm">
+              {/* <div className="p-4 bg-white rounded-lg shadow-sm">
                 <h3 className="mb-3 text-lg font-semibold text-gray-900">
                   Key Features
                 </h3>
@@ -442,10 +387,10 @@ const ProductDetail = () => {
                     </li>
                   ))}
                 </ul>
-              </div>
+              </div> */}
 
               {/* Trust Badges */}
-              <div className="grid grid-cols-2 gap-4">
+              {/* <div className="grid grid-cols-2 gap-4">
                 <div className="flex items-center p-3 space-x-3 bg-white rounded-lg shadow-sm">
                   <Truck className="w-6 h-6 text-green-500" />
                   <div>
@@ -460,7 +405,7 @@ const ProductDetail = () => {
                     <p className="text-xs text-gray-500">100% Protected</p>
                   </div>
                 </div>
-              </div>
+              </div> */}
 
               {/* Action Buttons */}
               <div className="space-y-4">

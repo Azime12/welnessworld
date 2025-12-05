@@ -3,14 +3,14 @@ const Footer = () => {
     <footer className="text-white bg-gray-900">
       {/* Footer Top Section */}
       <div className="container px-4 py-8 mx-auto">
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-8 xs:justify-center md:grid-cols-2 lg:grid-cols-4">
           
           {/* Logo Section with Animation */}
           <div className="logo-footer">
             <div className="footer-logos">
               <div className="wheel"></div>
             </div>
-            <p className="mt-4 text-gray-400">Your one-stop shop for wellness!</p>
+            <p className="mt-4 text-gray-400">Your one-stop shop for toys!</p>
           </div>
 
          {/* Sister Companies */}
@@ -64,17 +64,17 @@ const Footer = () => {
             <h4 className="mb-4 text-lg font-semibold text-white">Contact Us</h4>
             <p className="mb-4">
               <a 
-                href="mailto:contact@toyvista.com" 
+                href="mailto:contact@welnessworld.com" 
                 className="text-gray-400 transition-colors duration-200 hover:text-white"
               >
-                Email: contact@wellnesWorld.com
+                Email: contact@welnessworld.com
               </a>
             </p>
 
             {/* Social Icons */}
             <div className="flex mb-6 space-x-4">
               <a
-                href="https://facebook.com/toyvistacom"
+                href="https://facebook.com/welnessworldcom"
                 className="text-gray-400 transition-colors duration-200 hover:text-blue-500"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -83,7 +83,7 @@ const Footer = () => {
                 <i className="fab fa-facebook fa-lg"></i>
               </a>
               <a
-                href="https://www.instagram.com/toyvistacom/"
+                href="https://www.instagram.com/welnessworldcom/"
                 className="text-gray-400 transition-colors duration-200 hover:text-pink-500"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -92,7 +92,7 @@ const Footer = () => {
                 <i className="fab fa-instagram fa-lg"></i>
               </a>
               <a
-                href="https://www.pinterest.com/toyvistacom/"
+                href="https://www.pinterest.com/welnessworldcom/"
                 className="text-gray-400 transition-colors duration-200 hover:text-red-600"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -101,7 +101,7 @@ const Footer = () => {
                 <i className="fab fa-pinterest fa-lg"></i>
               </a>
               <a
-                href="https://www.tiktok.com/@toyvistacom"
+                href="https://www.tiktok.com/@welnessworldcom"
                 className="text-gray-400 transition-colors duration-200 hover:text-black"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -136,7 +136,7 @@ const Footer = () => {
       <div className="border-t border-gray-800 bg-gray-950">
         <div className="container px-4 py-4 mx-auto">
           <p className="text-sm text-center text-gray-400">
-            © 2025 ToyVista. All rights reserved | Developed by{' '}
+            © 2025 welnessworld. All rights reserved | Developed by{' '}
             <a
               href="https://marketingethiopia.com"
               target="_blank"
@@ -166,7 +166,7 @@ const Footer = () => {
           position: absolute;
           bottom: 10px;
           left: 0;
-          animation: roll 4s linear infinite alternate;
+          animation: roll 8s linear infinite alternate;
         }
 
         @keyframes roll {

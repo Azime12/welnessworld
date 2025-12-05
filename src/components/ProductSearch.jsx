@@ -5,7 +5,7 @@ import { BASE_URL } from "../constants/apiTags";
 // Custom hook to get query params
 const useQuery = () => new URLSearchParams(useLocation().search);
 
-// Helper function to highlight text
+// Highlight function
 const highlightText = (text, keyword) => {
   if (!keyword) return text;
   const regex = new RegExp(`(${keyword})`, "gi");
@@ -61,9 +61,11 @@ const ProductSearchResults = () => {
   return (
     <section className="min-h-screen py-12 bg-gray-50">
       <div className="container px-4 mx-auto">
+        
+        {/* Header */}
         <div className="flex flex-col items-center justify-center gap-5 mb-8 sm:flex-row">
           <h2 className="text-2xl font-bold text-center text-gray-900">
-            Search Results for <span className="text-blue-600">"{keyword}"</span>
+            {/* Search Results for <span className="text-blue-600">"{keyword}"</span> */}
           </h2>
           <button
             onClick={() => navigate("/")}
@@ -73,10 +75,12 @@ const ProductSearchResults = () => {
           </button>
         </div>
 
-        {loading && <p className="text-center text-gray-600">Loading...</p>}
+        {/* Messages */}
+        {loading && <p className="text-center text-gray-600">Searching...</p>}
         {error && <p className="text-center text-red-500">{error}</p>}
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        {/* PRODUCT GRID FIXED */}
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {products.map((product) => (
             <div
               key={product.id}
@@ -95,26 +99,30 @@ const ProductSearchResults = () => {
                   loading="lazy"
                 />
               </a>
+
               <div className="flex flex-col flex-grow p-4">
                 <h3 className="mb-2 text-sm font-semibold text-gray-900 line-clamp-3">
                   {highlightText(product.name, keyword)}
                 </h3>
+
                 <p className="mb-2 text-gray-600 line-clamp-2">
                   {highlightText(
                     product.description || "No description available",
                     keyword
                   )}
                 </p>
+
                 {product.price && (
                   <span className="text-lg font-bold text-blue-600">
                     ${parseFloat(product.price).toFixed(2)}
                   </span>
                 )}
+
                 <a
                   href={product.tracking_link || "#"}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-3 py-2 mt-auto text-center text-white bg-blue-600 rounded hover:bg-blue-700"
+                  className="px-3 py-2 mt-auto text-center text-white rounded bg-emerald-600 hover:bg-emerald-700"
                 >
                   Check Price
                 </a>
@@ -122,6 +130,7 @@ const ProductSearchResults = () => {
             </div>
           ))}
         </div>
+
       </div>
     </section>
   );

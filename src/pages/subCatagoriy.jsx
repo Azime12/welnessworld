@@ -80,6 +80,11 @@ const SubCategory = () => {
   const getSlug = (subcategory) =>
     subcategory.slug || subcategory.name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
 
+  useEffect(() => {
+  // Scroll to top whenever the component mounts or category changes
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}, [category]); // dependency: scroll whenever category changes
+
   /**
    * ============================
    *        LOADING UI
@@ -104,14 +109,14 @@ const SubCategory = () => {
     <main className="flex-grow">
 
       {/* Header */}
-      <div className="py-4 text-white bg-[#004400] shadow-md">
+      <div className="py-4 text-white shadow-md bg-emerald-950">
         <div className="container px-4 mx-auto">
           <div className="flex items-center justify-between">
 
             {/* Back Button - left aligned */}
             <button
               onClick={() => navigate("/categories")}
-              className="text-sm transition text-[#99CC33] hover:text-white"
+              className="text-sm transition text-[#f8faf6] hover:text-white"
             >
               &lt; Back
             </button>
@@ -139,7 +144,7 @@ const SubCategory = () => {
         <div className="container mx-auto">
 
           <div className="mb-8 text-center">
-            <h2 className="text-xl font-bold text-[#004400]">
+            <h2 className="text-xl font-bold text-[#171817]">
               Choose a {category?.name?.toLowerCase()} Subcategory
             </h2>
             <p className="mt-2 text-gray-600">
@@ -168,13 +173,13 @@ const SubCategory = () => {
                   state={{ subcategory, parentCategory: category }}
                   className="
                     group p-3 text-center bg-white border rounded-2xl 
-                    shadow-sm border-[#00990022]
-                    hover:border-[#009900]
+                    shadow-sm border-[#1a1a1a22]
+                    hover:border-[#141414]
                     hover:shadow-lg 
                     transition-all duration-300
                   "
                 >
-                  <h3 className="mb-2 text-lg font-semibold text-[#004400] group-hover:text-[#009900]">
+                  <h3 className="mb-2 xs:p-1 xs:m-2 text-lg font-semibold text-[#2e2e2e] group-hover:text-[#2c2c2c]">
                     {subcategory.name}
                   </h3>
 
@@ -184,7 +189,7 @@ const SubCategory = () => {
                     </p>
                   )}
 
-                  <div className="mt-4 text-[#009900] opacity-0 group-hover:opacity-100 transition">
+                  <div className="mt-4 text-[#000000] opacity-0 group-hover:opacity-100 transition">
                     View products →
                   </div>
                 </Link>

@@ -1,27 +1,35 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
 import { BASE_URL } from "../constants/apiTags";
 
 const LatestBlogs = () => {
   const [blogPosts, setBlogPosts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+
+  const LOCAL_KEY = "latest_blogs_cache_Wellness";
 
   useEffect(() => {
+    // 1️⃣ Load instantly from localStorage
+    const cachedData = localStorage.getItem(LOCAL_KEY);
+    if (cachedData) {
+      setBlogPosts(JSON.parse(cachedData));
+      setLoading(false);
+    }
+
+    // 2️⃣ Fetch latest blogs from API
     const fetchBlogs = async () => {
       try {
-        setLoading(true);
-        setError("");
-        const response = await axios.get(`${BASE_URL}/blogs.php`);
-        if (response.data && Array.isArray(response.data)) {
-          setBlogPosts(response.data.slice(0, 6)); // latest 6 blogs
-        } else {
-          setError("No blogs found.");
+        const res = await fetch(`${BASE_URL}/blogs.php`);
+        if (!res.ok) throw new Error("API response not OK");
+
+        const data = await res.json();
+        if (Array.isArray(data) && data.length > 0) {
+          const latestBlogs = data.slice(0, 6);
+          setBlogPosts(latestBlogs);
+          localStorage.setItem(LOCAL_KEY, JSON.stringify(latestBlogs));
         }
       } catch (err) {
-        console.error(err);
-        setError("Failed to load blogs.");
+        console.warn("Network error → using cached data", err);
       } finally {
         setLoading(false);
       }
@@ -32,77 +40,91 @@ const LatestBlogs = () => {
 
   const formatDate = (dateStr) => {
     const d = new Date(dateStr);
-    return isNaN(d) ? "" : d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+    return isNaN(d)
+      ? ""
+      : d.toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        });
   };
 
-  const getExcerpt = (content, length = 120) => {
-    if (!content) return "Read this latest post to know more...";
-    return content.length > length ? content.slice(0, length) + "..." : content;
-  };
+// Remove HTML + return clean excerpt
+const getExcerpt = (content, length = 120) => {
+  if (!content) return "Read this latest post to know more...";
+
+  // Create a temporary element to strip HTML
+  const temp = document.createElement("div");
+  temp.innerHTML = content;
+  const text = temp.textContent || temp.innerText || "";
+
+  return text.length > length ? text.slice(0, length) + "..." : text;
+};
 
   return (
-    <section className="py-16 bg-white">
+    <section className="py-16 bg-gradient-to-b from-white via-blue-50/40 to-white">
       <div className="container px-4 mx-auto">
+
+        {/* Header */}
         <div className="mb-12 text-center">
-          <h2 className="mb-4 text-4xl font-bold text-[#004400]">
-            Latest <span className="text-[#009900]">Blog Posts</span>
+          <h2 className="text-4xl font-bold text-emerald-950 md:text-5xl font-[Fredoka]">
+            Latest{" "}
+            <span className="text-transparent bg-gradient-to-r from-emerald-600 to-green-500 bg-clip-text">
+              Blogs
+            </span>
           </h2>
-          <div className="flex items-center justify-center mb-6">
-            <div className="w-12 h-1 bg-[#004400] rounded-full"></div>
-            <div className="w-4 h-1 mx-2 bg-[#009900] rounded-full"></div>
-            <div className="w-2 h-1 bg-[#99CC33] rounded-full"></div>
-          </div>
+          <p className="mt-2 text-gray-600">Stay updated with our latest toy guides and insights</p>
         </div>
 
-        {loading && <p className="text-center text-gray-600">Loading blogs...</p>}
-        {error && <p className="text-center text-red-500">{error}</p>}
+        {/* Loading — only if no cache */}
+        {loading && blogPosts.length === 0 && (
+          <p className="font-medium text-center text-gray-600 animate-pulse">Loading blogs...</p>
+        )}
 
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+        {/* Blog Grid */}
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {blogPosts.map((post) => (
-            <article
+            <div
               key={post.id}
-              className="relative overflow-hidden transition-all duration-300 transform bg-white border border-gray-100 shadow-sm rounded-2xl hover:shadow-2xl hover:-translate-y-2 group"
+              className="flex flex-col transition-transform duration-300 transform bg-white border border-gray-100 shadow-md rounded-2xl hover:shadow-2xl hover:-translate-y-2 group"
             >
-              <div className="relative overflow-hidden">
+              {/* Image */}
+              <Link to={`/blog/${post.slug}`} state={{ blog: post }} className="relative block overflow-hidden rounded-t-2xl">
                 <img
                   src={post.image_url}
                   alt={post.title}
                   className="object-cover w-full h-48 transition-transform duration-500 group-hover:scale-110"
                   loading="lazy"
                 />
-                <div className="absolute top-4 left-4">
-                  <span className="px-3 py-1 text-xs font-medium text-white bg-[#009900] rounded-full">
-                    Blog
-                  </span>
-                </div>
-              </div>
+                <span className="absolute px-3 py-1 text-xs font-semibold text-white rounded-full top-3 left-3 bg-gradient-to-r from-emerald-600 to-green-400">
+                  Blog
+                </span>
+              </Link>
 
-              <div className="p-6">
-                <h3 className="mb-3 text-lg font-bold text-[#004400] transition-colors duration-200 line-clamp-2 group-hover:text-[#009900]">
-                  {post.title}
-                </h3>
+              {/* Content */}
+              <div className="flex flex-col flex-grow p-5">
+                <Link to={`/blog/${post.slug}`} state={{ blog: post }}>
+                  <h3 className="text-lg font-semibold text-gray-900 font-[Fredoka] line-clamp-2 hover:text-emerald-600 transition-colors duration-200">
+                    {post.title}
+                  </h3>
+                </Link>
+                <p className="mt-2 text-sm text-gray-600 line-clamp-3">{getExcerpt(post.content)}</p>
 
-                <p className="mb-4 text-sm leading-relaxed text-gray-600 line-clamp-3">
-                  {getExcerpt(post.content)}
-                </p>
-
-                <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                <div className="flex items-center justify-between mt-4">
                   <span className="text-xs text-gray-500">{formatDate(post.created_at)}</span>
                   <Link
                     to={`/blog/${post.slug}`}
                     state={{ blog: post }}
-                    className="inline-flex items-center gap-2 text-sm font-medium text-[#009900] transition-colors duration-200 hover:text-[#99CC33] group/readmore"
+                    className="px-4 py-1 text-xs font-semibold text-white transition-opacity duration-200 rounded-full shadow bg-gradient-to-r from-green-600 to-emerald-600 hover:opacity-90"
                   >
                     Read More
-                    <svg className="w-4 h-4 transition-transform duration-200 transform group-hover/readmore:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                    </svg>
                   </Link>
                 </div>
               </div>
 
-              <div className="absolute bottom-0 left-0 w-0 h-1 transition-all duration-500 bg-gradient-to-r from-[#004400] via-[#009900] to-[#99CC33] group-hover:w-full"></div>
-            </article>
+              {/* Gradient underline hover effect */}
+              <div className="absolute bottom-0 left-0 w-0 h-1 transition-all duration-500 rounded-full bg-gradient-to-r from-blue-600 via-green-400 to-green-500 group-hover:w-full"></div>
+            </div>
           ))}
         </div>
       </div>

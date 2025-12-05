@@ -1,436 +1,213 @@
 // src/pages/ProductList.jsx
-import React, { useState, useEffect } from 'react';
-import { useParams, Link, useLocation, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { BASE_URL } from '../constants/apiTags';
-import { Search, Filter, Star, TrendingUp, Package, Sparkles, Loader, ChevronLeft } from 'lucide-react';
+import React, { useEffect, useState } from "react";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { BASE_URL } from "../constants/apiTags";
 
-const ProductList = () => {
-  const { slug } = useParams(); // subcategory slug from URL
+export default function ProductList() {
+  const { slug } = useParams(); 
   const location = useLocation();
   const navigate = useNavigate();
-  
-  const [searchQuery, setSearchQuery] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [sortOption, setSortOption] = useState('featured');
+
+  const subcategory_id1 = location.state?.subcategory?.id;
+  const subcategory_name = location.state?.subcategory?.name || slug;
+
   const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [subcategory, setSubcategory] = useState(location.state?.subcategory || null);
-  const [parentCategory, setParentCategory] = useState(location.state?.parentCategory || null);
-  const [totalPages, setTotalPages] = useState(1);
-  
-  const productsPerPage = 20;
+  const [currentPage, setCurrentPage] = useState(1);
+  const PAGE_SIZE = 12; // 12 items per page
 
-  // Fetch subcategory and products
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      setError(null);
+    if (!subcategory_id1) return;
 
+    async function fetchProducts() {
       try {
-        // First, try to get subcategory by slug
-        let subcategoryData = subcategory;
-        
-        if (!subcategoryData && slug) {
-          const subRes = await axios.get(`${BASE_URL}/subcategories.php`, {
-            params: { slug }
-          });
-          
-          if (subRes.data && subRes.data.length > 0) {
-            subcategoryData = subRes.data[0];
-            setSubcategory(subcategoryData);
-            
-            // Fetch parent category if we have parent_category_id
-            if (subcategoryData.parent_category_id) {
-              try {
-                const catRes = await axios.get(`${BASE_URL}/categories.php`, {
-                  params: { id: subcategoryData.parent_category_id }
-                });
-                if (catRes.data) {
-                  setParentCategory(catRes.data);
-                }
-              } catch (catErr) {
-                console.error("Error fetching parent category:", catErr);
-              }
-            }
-          }
-        }
-
-        // Now fetch products for this subcategory
-        const prodRes = await axios.get(`${BASE_URL}/products.php`);
-        console.log("products",prodRes)
-        if (prodRes.data && Array.isArray(prodRes.data)) {
-          // Filter products by subcategory if we have one
-          let filteredProducts = prodRes.data;
-          
-          if (subcategoryData && subcategoryData.id) {
-            filteredProducts = prodRes.data.filter(product => 
-              product.subcategory_id1 === subcategoryData.id.toString() ||
-              product.subcategory_id === subcategoryData.id.toString()
-            );
-          }
-          
-          // Format products with defaults
-          const formattedProducts = filteredProducts.map(product => ({
-            id: product.id,
-            name: product.name || '',
-            description: product.description || '',
-            price: product.price ? `$${parseFloat(product.price).toFixed(2)}` : '$0.00',
-            originalPrice: product.original_price ? `$${parseFloat(product.original_price).toFixed(2)}` : null,
-            rating: 4.0 + Math.random() * 1.0, // Generate random rating between 4.0-5.0
-            reviewCount: Math.floor(Math.random() * 500) + 50,
-            image: product.image_url || `https://via.placeholder.com/300x300/1e88e5/ffffff?text=${encodeURIComponent(product.name?.substring(0, 10) || 'Toy')}`,
-            slug: product.slug || `product-${product.id}`,
-            asin: product.asin || '',
-            tracking_link: product.tracking_link || '',
-            is_trending: product.is_trending || 0,
-            created_at: product.created_at,
-            features: [
-              'Premium quality materials',
-              'Safe for children',
-              'Educational and fun',
-              'Great value for money'
-            ],
-            specifications: [
-              { label: 'Material', value: 'High-quality plastic' },
-              { label: 'Age Range', value: '4+ years' },
-              { label: 'Batteries', value: 'Not required' }
-            ]
-          }));
-          
-          setProducts(formattedProducts);
-          
-          // Calculate total pages
-          const total = Math.ceil(formattedProducts.length / productsPerPage);
-          setTotalPages(total > 0 ? total : 1);
-        } else {
-          throw new Error("No products found");
-        }
-
-      } catch (err) {
-        console.error("Error fetching products:", err);
-        setError("Failed to load products. Please try again later.");
-        
-        // Fallback to mock data from your API sample
-        const apiProducts = [
-          // Your API data here (first 20 products from your sample)
-          {
-            "id": "3926",
-            "name": "LEGO Friends Friendship Tree House Hangout - Building Toy Playset for Kids, Girls and Boys, Ages 8+ - Pretend Play Gift Idea for Birthdays - with 4 Minidolls and 2 Animal Figures - 42652",
-            "description": "",
-            "price": "55.99",
-            "tracking_link": "https://www.amazon.com/dp/B0DJ1B5GGG?tag=toyvista101-20",
-            "asin": "B0DJ1B5GGG",
-            "image_url": "https://m.media-amazon.com/images/I/51yY00zisBL._SL500_.jpg",
-            "subcategory_id": null,
-            "created_at": "2025-04-20 20:26:37",
-            "subcategory_id1": "41",
-            "subcategory_id2": null,
-            "is_trending": "0",
-            "slug": "lego-friends-friendship-tree-house-hangout-building-toy-playset-for-kids-girls-and-boys-ages-8-pretend-play-gift-idea-for-birthdays-with-4-minidolls-and-2-animal-figures-42652"
-          },
-          // Add more products from your API data...
-        ];
-        
-        const formattedProducts = apiProducts.map(product => ({
-          id: product.id,
-          name: product.name || '',
-          description: product.description || 'High-quality building toy for creative play',
-          price: product.price ? `$${parseFloat(product.price).toFixed(2)}` : '$0.00',
-          rating: 4.0 + Math.random() * 1.0,
-          reviewCount: Math.floor(Math.random() * 500) + 50,
-          image: product.image_url || `https://via.placeholder.com/300x300/1e88e5/ffffff?text=Toy`,
-          slug: product.slug || `product-${product.id}`,
-          asin: product.asin || '',
-          tracking_link: product.tracking_link || '',
-          is_trending: product.is_trending || 0,
-          created_at: product.created_at,
-          features: [
-            'Premium quality materials',
-            'Safe for children',
-            'Educational and fun',
-            'Great value for money'
-          ],
-          specifications: [
-            { label: 'Material', value: 'High-quality plastic' },
-            { label: 'Age Range', value: '4+ years' },
-            { label: 'Batteries', value: 'Not required' }
-          ]
-        }));
-        
-        setProducts(formattedProducts);
-        setTotalPages(3);
-      } finally {
-        setLoading(false);
+        const res = await axios.get(`${BASE_URL}/products.php`, {
+          params: { subcategory_id1 },
+        });
+        setProducts(res.data || []);
+      } catch (error) {
+        console.error("Error loading products", error);
       }
-    };
-
-    fetchData();
-  }, [slug, location.state]);
-
-  // Handle search
-  const handleSearch = (e) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
     }
-  };
 
-  // Handle sort
-  const getSortedAndPaginatedProducts = () => {
-    let sortedProducts = [...products];
-    
-    // Apply sorting
-    switch (sortOption) {
-      case 'price-low':
-        sortedProducts.sort((a, b) => {
-          const priceA = parseFloat(a.price.replace('$', '')) || 0;
-          const priceB = parseFloat(b.price.replace('$', '')) || 0;
-          return priceA - priceB;
-        });
-        break;
-      case 'price-high':
-        sortedProducts.sort((a, b) => {
-          const priceA = parseFloat(a.price.replace('$', '')) || 0;
-          const priceB = parseFloat(b.price.replace('$', '')) || 0;
-          return priceB - priceA;
-        });
-        break;
-      case 'rating':
-        sortedProducts.sort((a, b) => b.rating - a.rating);
-        break;
-      case 'newest':
-        sortedProducts.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-        break;
-      default:
-        // Featured - sort by trending first
-        sortedProducts.sort((a, b) => (b.is_trending || 0) - (a.is_trending || 0));
-        break;
-    }
-    
-    // Apply pagination
-    const startIndex = (currentPage - 1) * productsPerPage;
-    const endIndex = startIndex + productsPerPage;
-    
-    return sortedProducts.slice(startIndex, endIndex);
-  };
+    fetchProducts();
+  }, [subcategory_id1]);
 
-  // Render star ratings
-  const renderStars = (rating) => {
-    return (
-      <div className="flex items-center">
-        {[...Array(5)].map((_, i) => (
-          <Star
-            key={i}
-            className={`w-4 h-4 ${i < Math.floor(rating) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`}
-          />
-        ))}
-        <span className="ml-2 text-sm text-gray-600">{rating.toFixed(1)}</span>
-      </div>
-    );
-  };
+  const showPrice = (price) =>
+    price &&
+    price !== "0" &&
+    price !== 0 &&
+    price !== "" &&
+    price !== null &&
+    price !== undefined;
 
-  // Loading state
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="container flex flex-col items-center justify-center min-h-screen px-4 mx-auto">
-          <Loader className="w-12 h-12 mb-4 text-blue-600 animate-spin" />
-          <p className="text-gray-600">Loading products...</p>
-        </div>
-      </div>
-    );
-  }
+  // Pagination Logic
+  const totalPages = Math.ceil(products.length / PAGE_SIZE);
+  const paginatedProducts = products.slice(
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE
+  );
+
+  const goToDetail = (product) => {
+    navigate(`/product/${product.slug}/detail`, { state: { product } });
+  };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      
-      {/* Error Message */}
-      {error && (
-        <div className="container px-4 mx-auto mt-6">
-          <div className="p-4 text-yellow-700 bg-yellow-100 border border-yellow-400 rounded-lg">
-            <p className="font-medium">⚠️ {error}</p>
-            <p className="mt-1 text-sm">Showing available products</p>
-          </div>
+   <main className="pb-12 md:px-8">
+  {/* Back Button */}
+  <button
+    onClick={() => navigate(-1)}
+    className="flex items-center mt-2 mb-4 text-sm transition-colors text-emerald-700 hover:text-emerald-800"
+  >
+    <svg 
+      xmlns="http://www.w3.org/2000/svg" 
+      className="w-4 h-4 mr-1" 
+      viewBox="0 0 20 20" 
+      fill="currentColor"
+    >
+      <path 
+        fillRule="evenodd" 
+        d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" 
+        clipRule="evenodd" 
+      />
+    </svg>
+    Back
+  </button>
+
+  {/* Center Title */}
+  <h1 className="mb-8 text-2xl font-bold text-center text-gray-900 md:text-3xl">
+    {subcategory_name}
+  </h1>
+
+  {/* Product Grid */}
+  <div className="grid grid-cols-2 gap-5 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+    {paginatedProducts.map((product) => (
+      <div
+        key={product.id}
+        className="overflow-hidden transition-all duration-300 bg-white border border-gray-200 rounded-xl hover:shadow-xl hover:border-[#66CB67]/20 hover:scale-[1.02]"
+      >
+        {/* Product Image Container */}
+        <div
+          onClick={() => goToDetail(product)}
+          className="relative overflow-hidden cursor-pointer bg-gray-50"
+        >
+          <img
+            src={product.image_url}
+            alt={product.name}
+            className="object-cover w-full h-48 transition-transform duration-500 hover:scale-110"
+            onError={(e) => {
+              e.target.src = "https://via.placeholder.com/300x300?text=No+Image";
+            }}
+          />
+          {/* Image Overlay Gradient */}
+          <div className="absolute inset-0 transition-opacity duration-300 opacity-0 bg-gradient-to-t from-black/5 to-transparent hover:opacity-100"></div>
         </div>
-      )}
 
-      {/* Main Content */}
-      <main className="container px-4 py-8 mx-auto">
-       
+        {/* Product Info */}
+        <div className="p-4">
+          {/* Product Name */}
+          <h3 className="h-12 font-semibold text-gray-800 line-clamp-2">
+            {product.name}
+          </h3>
 
-        {/* Filters and Sort Bar */}
-        <div className="flex flex-col items-start justify-between p-4 mb-8 bg-white rounded-lg shadow-sm md:flex-row md:items-center">
-          <div className="flex items-center mb-4 md:mb-0">
-            <Filter className="w-5 h-5 mr-2 text-gray-600" />
-            <h3 className="font-semibold text-gray-700">Filters & Sorting</h3>
-          </div>
-          
-          <div className="flex items-center space-x-4">
-            <select 
-              value={sortOption}
-              onChange={(e) => setSortOption(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="featured">Featured</option>
-              <option value="price-low">Price: Low to High</option>
-              <option value="price-high">Price: High to Low</option>
-              <option value="rating">Highest Rated</option>
-              <option value="newest">Newest</option>
-            </select>
-            
-            <div className="items-center hidden space-x-2 text-sm text-gray-600 md:flex">
-              <TrendingUp className="w-4 h-4" />
-              <span>Trending Now</span>
+          {/* Price */}
+          {/* {showPrice(product.price) && (
+            <div className="mt-2 text-lg font-bold text-[#007BFF]">
+              {product.price}
             </div>
-          </div>
+          )} */}
+
+          {/* View Detail Button */}
+          <button
+            onClick={() => goToDetail(product)}
+            className="w-full px-4 py-3 mt-4 font-semibold text-white transition-all duration-300 rounded-lg bg-gradient-to-r from-emerald-700 to-emerald-500 hover:from-emerald-800 hover:to-emerald-500 hover:shadow-lg active:scale-95"
+          >
+            View Details
+          </button>
         </div>
+      </div>
+    ))}
+  </div>
 
-        {/* Products Grid */}
-        <div className="grid grid-cols-1 gap-6 mb-12 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {getSortedAndPaginatedProducts().map((product) => (
-            <div 
-              key={product.id}
-              className="overflow-hidden transition-all duration-300 transform bg-white shadow-lg rounded-xl hover:shadow-2xl hover:-translate-y-1"
-            >
-              <div className="relative h-48 overflow-hidden bg-gray-100">
-                <img 
-                  src={product.image} 
-                  alt={product.name}
-                  className="object-contain w-full h-full p-4 transition-transform duration-300 hover:scale-105"
-                  onError={(e) => {
-                    e.target.src = "https://via.placeholder.com/300x300/1e88e5/ffffff?text=Toy";
-                  }}
-                />
-                {/* {product.is_trending!='0' ? (
-                  <div className="absolute px-2 py-1 text-xs font-bold text-white bg-yellow-500 rounded top-2 right-2">
-                    Trending
-                  </div>
-                ) : (
-                  <div className="absolute px-2 py-1 text-xs font-bold text-white bg-green-500 rounded top-2 right-2">
-                    New
-                  </div>
-                )} */}
-              </div>
-              
-              <div className="p-4">
-                <Link 
-                  to={`/product/${product.slug}`}
-                  state={{ 
-                    product,
-                    subcategory,
-                    parentCategory 
-                  }}
-                  className="block mb-2 group"
-                >
-                  <h3 className="text-sm font-semibold text-gray-800 transition-colors line-clamp-2 group-hover:text-blue-600">
-                    {product.name}
-                  </h3>
-                  {product.description && (
-                    <p className="mt-1 text-xs text-gray-500 line-clamp-2">
-                      {product.description || 'High-quality toy for creative play'}
-                    </p>
-                  )}
-                </Link>
-                
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-lg font-bold text-blue-600">
-                {product?.price } 
-                  </span>
-                </div>
-                
-                {/* <div className="flex items-center justify-between mb-4">
-                  <span className="text-xs text-gray-500">
-                    {product.reviewCount} reviews
-                  </span>
-                  {product.asin && (
-                    <span className="text-xs text-gray-400">ASIN: {product.asin}</span>
-                  )}
-                </div> */}
-                
-                <Link 
-                  to={`/product/${product.slug}/detail`}
-                  state={{ 
-                    product,
-                    subcategory,
-                    parentCategory 
-                  }}
-                  className="block w-full px-4 py-2 font-semibold text-center text-white transition-all duration-300 rounded-lg shadow-md bg-gradient-to-r from-green-400 to-green-800 hover:from-blue-600 hover:to-blue-700 hover:shadow-lg"
-                >
-                  View Details
-                </Link>
-              </div>
-            </div>
-          ))}
-        </div>
+  {/* Pagination */}
+  {products.length > PAGE_SIZE && (
+    <div className="flex flex-col items-center justify-center mt-10 space-y-4 md:flex-row md:space-y-0 md:space-x-4">
+      <button
+        disabled={currentPage === 1}
+        onClick={() => setCurrentPage((p) => p - 1)}
+        className={`flex items-center justify-center px-5 py-3 border rounded-xl transition-all duration-300 ${
+          currentPage === 1
+            ? "cursor-not-allowed bg-gray-100 text-gray-400 border-gray-200"
+            : "bg-white text-emerald-700 border-emerald-300 hover:bg-emerald-600 hover:text-white hover:border-emerald-500 hover:shadow-md"
+        }`}
+      >
+        <svg 
+          xmlns="http://www.w3.org/2000/svg" 
+          className="w-5 h-5 mr-2" 
+          viewBox="0 0 20 20" 
+          fill="currentColor"
+        >
+          <path 
+            fillRule="evenodd" 
+            d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" 
+            clipRule="evenodd" 
+          />
+        </svg>
+        Previous
+      </button>
 
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="flex justify-center mb-12 space-x-2">
-            <button
-              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-              disabled={currentPage === 1}
-              className="px-4 py-2 text-blue-600 transition-colors bg-white border border-blue-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-blue-50"
-            >
-              Previous
-            </button>
-            
-            {Array.from({ length: Math.min(totalPages, 5) }, (_, index) => {
-              const pageNum = index + 1;
-              return (
-                <button
-                  key={pageNum}
-                  onClick={() => setCurrentPage(pageNum)}
-                  className={`px-4 py-2 rounded-lg transition-all duration-300 ${
-                    currentPage === pageNum
-                      ? 'bg-blue-600 text-white shadow-lg'
-                      : 'bg-white text-blue-600 border border-blue-200 hover:bg-blue-50'
-                  }`}
-                >
-                  {pageNum}
-                </button>
-              );
-            })}
-            
-            {totalPages > 5 && (
-              <>
-                <span className="px-2 py-2">...</span>
-                <button
-                  onClick={() => setCurrentPage(totalPages)}
-                  className={`px-4 py-2 rounded-lg transition-all duration-300 ${
-                    currentPage === totalPages
-                      ? 'bg-blue-600 text-white shadow-lg'
-                      : 'bg-white text-blue-600 border border-blue-200 hover:bg-blue-50'
-                  }`}
-                >
-                  {totalPages}
-                </button>
-              </>
-            )}
-            
-            <button
-              onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-              disabled={currentPage === totalPages}
-              className="px-4 py-2 text-blue-600 transition-colors bg-white border border-blue-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-blue-50"
-            >
-              Next
-            </button>
-          </div>
-        )}
+      <div className="flex items-center space-x-2">
+        <span className="px-4 py-2 font-medium text-gray-600">
+          Page
+        </span>
+        <span className="px-4 py-2 font-bold text-white bg-emerald-400 rounded-lg min-w-[60px] text-center">
+          {currentPage}
+        </span>
+        <span className="px-4 py-2 font-medium text-gray-600">
+          of {totalPages}
+        </span>
+      </div>
 
-      </main>
-
-      <style jsx>{`
-        .line-clamp-2 {
-          display: -webkit-box;
-          -webkit-line-clamp: 2;
-          -webkit-box-orient: vertical;
-          overflow: hidden;
-        }
-      `}</style>
+      <button
+        disabled={currentPage === totalPages}
+        onClick={() => setCurrentPage((p) => p + 1)}
+        className={`flex items-center justify-center px-5 py-3 border rounded-xl transition-all duration-300 ${
+          currentPage === totalPages
+            ? "cursor-not-allowed bg-gray-100 text-gray-400 border-gray-200"
+            : "bg-white text-emerald-700 border-emerald-300 hover:bg-emerald-600 hover:text-white hover:border-emerald-500 hover:shadow-md"
+        }`}
+      >
+        Next
+        <svg 
+          xmlns="http://www.w3.org/2000/svg" 
+          className="w-5 h-5 ml-2" 
+          viewBox="0 0 20 20" 
+          fill="currentColor"
+        >
+          <path 
+            fillRule="evenodd" 
+            d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" 
+            clipRule="evenodd" 
+          />
+        </svg>
+      </button>
     </div>
-  );
-};
+  )}
 
-export default ProductList;
+  {/* Empty State */}
+  {paginatedProducts.length === 0 &&  (
+    <div className="flex flex-col items-center justify-center py-16 text-center">
+      <div className="w-24 h-24 mb-6 text-[#50A8FF]">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+        </svg>
+      </div>
+      <h3 className="mb-2 text-xl font-semibold text-gray-700">No Products Found</h3>
+      <p className="text-gray-500 max-w-[400px]">
+        No products are available in this category at the moment.
+      </p>
+    </div>
+  )}
+</main>
+  );
+}
